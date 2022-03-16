@@ -1,4 +1,4 @@
-package com.example.demo.web3;
+package com.example.demo.web3.services;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.web3j.contracts.eip20.generated.ERC20;
@@ -23,7 +23,6 @@ public class Web3Service {
     private static final Web3j client= Web3j.build(new HttpService("https://rinkeby.infura.io/v3/a9fadbdf4f204dd3aa9b733691763878"));
 
     public JSONObject getBalance(JSONObject address) {
-
         try {
             final EthGetBalance balance= client.ethGetBalance(address.get("address").toString(), DefaultBlockParameter.valueOf("latest")).sendAsync()
                     .get(30, TimeUnit.SECONDS);
@@ -39,6 +38,7 @@ public class Web3Service {
 
         ClientTransactionManager transactionManager= new ClientTransactionManager(client,address.get("address").toString());
         ERC20 contract = ERC20.load(tokenContract, client, transactionManager, new DefaultGasProvider());
+
         BigInteger balance = contract.balanceOf(address.get("address").toString()).send();
         String tokenName= contract.name().send();
         String tokenSymbol= contract.symbol().send();
@@ -80,7 +80,6 @@ public class Web3Service {
         TransactionReceipt receipt = Transfer.sendFunds(client, credentials, to, BigDecimal.valueOf(value), Convert.Unit.WEI).send();
 
         return receipt.getTransactionHash();
-
     }
 
     public String sendSignedERC20Transaction(JSONObject input,String tokenContract) throws ExecutionException, InterruptedException {
@@ -96,6 +95,7 @@ public class Web3Service {
         TransactionReceipt receipt = contract.transfer(to,valueB).sendAsync().get();
         return receipt.getTransactionHash();
     }
+
 
 
 }
