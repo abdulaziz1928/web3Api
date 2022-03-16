@@ -42,17 +42,25 @@ public class Web3Controller {
     public String sendSignedERC20Transaction(@RequestBody JSONObject input,@PathVariable String tokenContract) throws Exception {
         return  web3Service.sendSignedERC20Transaction(input,tokenContract);
     }
-    @GetMapping("/ethrate")
-    public JSONObject testContract(@RequestBody JSONObject input) throws Exception {
-        return swapService.getExchangeRate(input);
-    }
     @GetMapping("/price")
     public String getPrice(@RequestBody JSONObject input) throws Exception {
         return swapService.getPrice(input);
     }
-    @GetMapping("/swap/ethtoken")
+    @GetMapping("/pairrate")
+    public JSONObject getExchangeRate(@RequestBody JSONObject input) throws Exception {
+        return swapService.getExchangeRate(input);
+    }
+    @PostMapping("/swap/ethtoken")
     public String swapExactEthForToken(@RequestBody JSONObject input) throws Exception {
         return swapService.swapExactEthForToken(input);
+    }
+    @PostMapping("/swap/tokeneth")
+    public String swapExactTokensForETH(@RequestBody JSONObject input) throws Exception {
+        return swapService.swapExactTokensForETH(input);
+    }
+    @PostMapping("/swap/token")
+    public String swapExactTokensForTokens(@RequestBody JSONObject input) throws Exception {
+        return swapService.swapExactTokensForTokens(input);
     }
 
 }
