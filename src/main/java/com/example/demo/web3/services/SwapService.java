@@ -29,7 +29,6 @@ public class SwapService {
 
     //working
     public JSONObject getExchangeRate(JSONObject input) throws Exception {
-
         String token0=input.get("token_address0").toString();
         String token1= input.get("token_address1").toString();
         String privateKeys= input.get("private").toString();
@@ -68,7 +67,7 @@ public class SwapService {
 
 
     //ChainLink Price Feeds Input PrivateKey + Price Feed Contract Address
-    public String getPrice(JSONObject input) throws Exception {
+    public JSONObject getPrice(JSONObject input) throws Exception {
         String contractAddress=input.get("price_feed_address").toString();
         String privateKeys= input.get("private").toString();
         Credentials credentials= Credentials.create(privateKeys);
@@ -76,8 +75,13 @@ public class SwapService {
         AggregatorV3Interface contract= AggregatorV3Interface.load(contractAddress,clientMain,credentials,new DefaultGasProvider());
 
         Tuple5<BigInteger, BigInteger, BigInteger, BigInteger, BigInteger> s= contract.latestRoundData().send();
-        return s.toString();
+        double priceAmount= Double.parseDouble(s.component2().toString())/Math.pow(10,8);
+        JSONObject price= new JSONObject();
+        price.put("price",priceAmount);
+        price.put("last_update",s.component4());
+        return price;
     }
+
 
     //Working
     public String swapExactTokensForETH(JSONObject input) throws Exception {

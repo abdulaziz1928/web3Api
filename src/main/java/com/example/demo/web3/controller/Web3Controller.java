@@ -21,15 +21,17 @@ public class Web3Controller {
     }
 
     @GetMapping("/address/balance")
-    public JSONObject getBalance(@RequestBody JSONObject  address){
+    public JSONObject getBalance(JSONObject address){
         return  web3Service.getBalance(address);
     }
-
-    @GetMapping("/{tokenContract}/balance")
+    @GetMapping("/fees")
+    public JSONObject getFees() throws IOException {
+        return web3Service.getFees();
+    }
+    @PostMapping("/{tokenContract}/balance")
     public JSONObject getERC20Balance(@RequestBody JSONObject  address,@PathVariable String tokenContract) throws Exception {
         return web3Service.getERC20Balance(address,tokenContract);
     }
-
     @PostMapping("/tx")
     public RawTransaction sendTransaction(@RequestBody JSONObject input) throws IOException {
         return  web3Service.sendTransaction(input);
@@ -43,7 +45,7 @@ public class Web3Controller {
         return  web3Service.sendSignedERC20Transaction(input,tokenContract);
     }
     @GetMapping("/price")
-    public String getPrice(@RequestBody JSONObject input) throws Exception {
+    public JSONObject getPrice(@RequestBody JSONObject input) throws Exception {
         return swapService.getPrice(input);
     }
     @GetMapping("/pairrate")

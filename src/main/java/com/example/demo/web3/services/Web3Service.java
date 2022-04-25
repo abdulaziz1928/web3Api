@@ -1,4 +1,6 @@
 package com.example.demo.web3.services;
+import com.example.demo.web3.models.MyERC20;
+import io.reactivex.disposables.Disposable;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.web3j.contracts.eip20.generated.ERC20;
@@ -6,6 +8,7 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.RawTransaction;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ClientTransactionManager;
@@ -15,6 +18,8 @@ import org.web3j.utils.Convert;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.EventListener;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -38,18 +43,28 @@ public class Web3Service {
 
         ClientTransactionManager transactionManager= new ClientTransactionManager(client,address.get("address").toString());
         ERC20 contract = ERC20.load(tokenContract, client, transactionManager, new DefaultGasProvider());
-
         BigInteger balance = contract.balanceOf(address.get("address").toString()).send();
         String tokenName= contract.name().send();
         String tokenSymbol= contract.symbol().send();
-
         JSONObject balanceJson = new JSONObject();
-        balanceJson.put("your_address",address.get("address").toString());
+        balanceJson.put("address",address.get("address").toString());
         balanceJson.put("balance",balance.toString());
         balanceJson.put("token",tokenName);
         balanceJson.put("token_symbol",tokenSymbol);
+//        balanceJson.put("txs", List.of());
 
         return balanceJson;
+    }
+    public  JSONObject subscribeERC20Wallet(JSONObject address, String tokenContract){
+        ClientTransactionManager transactionManager= new ClientTransactionManager(client,address.get("address").toString());
+        MyERC20 contract = MyERC20.load(tokenContract, client, transactionManager, new DefaultGasProvider());
+        Disposable s=contract.transferEventFlowable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST).subscribe(tx ->{
+            String toAddress = tx.to;
+            String fromAddress = tx.from;
+            String txHash = tx.log.getTransactionHash();
+        });
+
+        return new JSONObject();
     }
 
     public RawTransaction sendTransaction(JSONObject input) throws IOException {
@@ -66,7 +81,18 @@ public class Web3Service {
         BigInteger gasPrice= gasProvider.getGasPrice();
         RawTransaction tx = RawTransaction.createEtherTransaction(nonce,gasPrice,gasLimit,to,value);
 
+
         return tx;
+    }
+
+    public JSONObject getFees() throws IOException {
+        DefaultGasProvider dgp=new DefaultGasProvider();
+        EthGasPrice s=client.ethGasPrice().send();
+        BigInteger fees=dgp.getGasLimit().multiply(s.getGasPrice());
+
+        JSONObject res= new JSONObject();
+        res.put("max_fee",fees.toString());
+        return res;
     }
 
     public String sendSignedTransaction(JSONObject input) throws Exception {
