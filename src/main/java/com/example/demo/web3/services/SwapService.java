@@ -49,7 +49,6 @@ public class SwapService {
 
     // Working
     public String swapExactEthForToken(JSONObject input) throws Exception {
-<<<<<<< HEAD
         String token1= input.get("token_address").toString();
         String privateKeys= input.get("private").toString();
         Credentials credentials= Credentials.create(privateKeys);
@@ -58,16 +57,6 @@ public class SwapService {
         DefaultGasProvider def=new DefaultGasProvider();
         StaticGasProvider s=new StaticGasProvider(def.getGasPrice().add(def.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
         UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,s);
-=======
-        String token1 = input.get("token_address").toString();
-        String privateKeys = input.get("private").toString();
-        Credentials credentials = Credentials.create(privateKeys);
-        String amnt = input.get("amount_eth").toString();
-        BigInteger amount = new BigInteger(amnt);
-
-        UniswapV2Router02 contractRouter = UniswapV2Router02.load(routerContractAddress, client, credentials,
-                new DefaultGasProvider());
->>>>>>> 20fc557db84401807f2c0eedb61ad9d92a59221b
 
         List amountsout = contractRouter
                 .getAmountsOut(new BigInteger(amnt), Arrays.asList(contractRouter.WETH().send(), token1)).send();
@@ -102,7 +91,6 @@ public class SwapService {
 
     // Working
     public String swapExactTokensForETH(JSONObject input) throws Exception {
-<<<<<<< HEAD
         String token0= input.get("token_address").toString();
         String privateKeys= input.get("private").toString();
         Credentials credentials= Credentials.create(privateKeys);
@@ -115,21 +103,6 @@ public class SwapService {
         double samountOutMin= Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
         long m= ((long) samountOutMin);
         BigInteger amountOutMin=new BigInteger(String.valueOf(m));
-=======
-        String token0 = input.get("token_address").toString();
-        String privateKeys = input.get("private").toString();
-        Credentials credentials = Credentials.create(privateKeys);
-        String amnt = input.get("amount_token").toString();
-        BigInteger amount = new BigInteger(amnt);
-
-        UniswapV2Router02 contractRouter = UniswapV2Router02.load(routerContractAddress, client, credentials,
-                new DefaultGasProvider());
-        List amountsout = contractRouter
-                .getAmountsOut(new BigInteger(amnt), Arrays.asList(token0, contractRouter.WETH().send())).send();
-        double samountOutMin = Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
-        long m = ((long) samountOutMin);
-        BigInteger amountOutMin = new BigInteger(String.valueOf(m));
->>>>>>> 20fc557db84401807f2c0eedb61ad9d92a59221b
         System.out.println(new BigInteger(String.valueOf(m)));
         System.out.println(amountsout);
         System.out.println(amountOutMin);
@@ -144,7 +117,6 @@ public class SwapService {
 
     // Working
     public String swapExactTokensForTokens(JSONObject input) throws Exception {
-<<<<<<< HEAD
         String token0= input.get("token_address0").toString();
         String token1= input.get("token_address1").toString();
         String privateKeys= input.get("private").toString();
@@ -159,21 +131,6 @@ public class SwapService {
         double samountOutMin= Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
         long m= ((long) samountOutMin);
         BigInteger amountOutMin=new BigInteger(String.valueOf(m));
-=======
-        String token0 = input.get("token_address0").toString();
-        String token1 = input.get("token_address1").toString();
-        String privateKeys = input.get("private").toString();
-        Credentials credentials = Credentials.create(privateKeys);
-        String amnt = input.get("amount_token0").toString();
-        BigInteger amount = new BigInteger(amnt);
-
-        UniswapV2Router02 contractRouter = UniswapV2Router02.load(routerContractAddress, client, credentials,
-                new DefaultGasProvider());
-        List amountsout = contractRouter.getAmountsOut(new BigInteger(amnt), Arrays.asList(token0, token1)).send();
-        double samountOutMin = Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
-        long m = ((long) samountOutMin);
-        BigInteger amountOutMin = new BigInteger(String.valueOf(m));
->>>>>>> 20fc557db84401807f2c0eedb61ad9d92a59221b
         System.out.println(new BigInteger(String.valueOf(m)));
         System.out.println(amountsout);
         System.out.println(amountOutMin);
