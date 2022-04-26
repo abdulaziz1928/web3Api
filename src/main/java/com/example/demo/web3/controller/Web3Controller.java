@@ -48,7 +48,7 @@ public class Web3Controller {
     public JSONObject getPrice(@RequestBody JSONObject input) throws Exception {
         return swapService.getPrice(input);
     }
-    @GetMapping("/pairrate")
+    @PostMapping("/pairrate")
     public JSONObject getExchangeRate(@RequestBody JSONObject input) throws Exception {
         return swapService.getExchangeRate(input);
     }

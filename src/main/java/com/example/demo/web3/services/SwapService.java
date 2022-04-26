@@ -8,6 +8,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple5;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tx.gas.StaticGasProvider;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -51,8 +52,9 @@ public class SwapService {
         Credentials credentials= Credentials.create(privateKeys);
         String amnt= input.get("amount_eth").toString();
         BigInteger amount= new BigInteger(amnt);
-
-        UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,new DefaultGasProvider());
+        DefaultGasProvider def=new DefaultGasProvider();
+        StaticGasProvider s=new StaticGasProvider(def.getGasPrice().add(def.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
+        UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,s);
 
         List amountsout= contractRouter.getAmountsOut(new BigInteger(amnt),List.of(contractRouter.WETH().send(),token1)).send();
         double samountOutMin= Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
@@ -90,8 +92,9 @@ public class SwapService {
         Credentials credentials= Credentials.create(privateKeys);
         String amnt= input.get("amount_token").toString();
         BigInteger amount= new BigInteger(amnt);
-
-        UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,new DefaultGasProvider());
+        DefaultGasProvider def=new DefaultGasProvider();
+        StaticGasProvider s=new StaticGasProvider(def.getGasPrice().add(def.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
+        UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,s);
         List amountsout= contractRouter.getAmountsOut(new BigInteger(amnt),List.of(token0,contractRouter.WETH().send())).send();
         double samountOutMin= Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
         long m= ((long) samountOutMin);
@@ -114,8 +117,10 @@ public class SwapService {
         Credentials credentials= Credentials.create(privateKeys);
         String amnt= input.get("amount_token0").toString();
         BigInteger amount= new BigInteger(amnt);
+        DefaultGasProvider def=new DefaultGasProvider();
+        StaticGasProvider s=new StaticGasProvider(def.getGasPrice().add(def.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
 
-        UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,new DefaultGasProvider());
+        UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,s);
         List amountsout= contractRouter.getAmountsOut(new BigInteger(amnt),List.of(token0,token1)).send();
         double samountOutMin= Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
         long m= ((long) samountOutMin);
