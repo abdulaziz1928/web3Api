@@ -20,8 +20,8 @@ public class Web3Controller {
         this.swapService=swapService;
     }
 
-    @GetMapping("/address/balance")
-    public JSONObject getBalance(JSONObject address){
+    @GetMapping("/address/{address}/balance")
+    public JSONObject getBalance(@PathVariable String address){
         return  web3Service.getBalance(address);
     }
     @GetMapping("/fees")
@@ -33,7 +33,7 @@ public class Web3Controller {
         return web3Service.getERC20Balance(address,tokenContract);
     }
     @PostMapping("/tx")
-    public RawTransaction sendTransaction(@RequestBody JSONObject input) throws IOException {
+    public JSONObject sendTransaction(@RequestBody JSONObject input) throws IOException {
         return  web3Service.sendTransaction(input);
     }
     @PostMapping("/tx/send")

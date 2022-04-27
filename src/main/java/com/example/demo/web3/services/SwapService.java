@@ -1,5 +1,4 @@
 package com.example.demo.web3.services;
-
 import com.example.demo.web3.models.*;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple5;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
@@ -22,14 +20,15 @@ public class SwapService {
     private static final Web3j clientMain = Web3j.build(
             new HttpService("https://mainnet.infura.io/v3/a9fadbdf4f204dd3aa9b733691763878"));
 
-    private static final String factoryContractAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
     private static final String routerContractAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 
+
+    //    private static final String factoryContractAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
     // private static final Web3j client= Web3j.build(
     // new
     // HttpService("https://rinkeby.infura.io/v3/a9fadbdf4f204dd3aa9b733691763878"));
 
-    // working
+    // get exchange rate given amount of token0
     public JSONObject getExchangeRate(JSONObject input) throws Exception {
         String token0 = input.get("token_address0").toString();
         String token1 = input.get("token_address1").toString();
@@ -43,11 +42,10 @@ public class SwapService {
 
         JSONObject j = new JSONObject();
         j.put("pair", r);
-        j.put("formula_to_use", "(token0Amount * 10 ^ token0Decimals) / (token1Amount * 10 ^ token0Decimals)");
         return j;
     }
 
-    // Working
+    // Swap ETH for as many tokens as possible
     public String swapExactEthForToken(JSONObject input) throws Exception {
         String token1= input.get("token_address").toString();
         String privateKeys= input.get("private").toString();
@@ -89,7 +87,7 @@ public class SwapService {
         return price;
     }
 
-    // Working
+    // Swap Tokens for as many eth as possible
     public String swapExactTokensForETH(JSONObject input) throws Exception {
         String token0= input.get("token_address").toString();
         String privateKeys= input.get("private").toString();
@@ -115,7 +113,7 @@ public class SwapService {
                 .sendAsync().get().getTransactionHash();
     }
 
-    // Working
+    // Swap Token0 for as many Token1 as possible
     public String swapExactTokensForTokens(JSONObject input) throws Exception {
         String token0= input.get("token_address0").toString();
         String token1= input.get("token_address1").toString();

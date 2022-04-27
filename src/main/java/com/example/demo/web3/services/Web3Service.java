@@ -1,6 +1,4 @@
 package com.example.demo.web3.services;
-import com.example.demo.web3.models.MyERC20;
-import io.reactivex.disposables.Disposable;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.web3j.contracts.eip20.generated.ERC20;
@@ -8,7 +6,6 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.RawTransaction;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ClientTransactionManager;
@@ -25,11 +22,12 @@ import java.util.concurrent.TimeUnit;
 public class Web3Service {
     private static final Web3j client= Web3j.build(new HttpService("https://rinkeby.infura.io/v3/a9fadbdf4f204dd3aa9b733691763878"));
 
-    public JSONObject getBalance(JSONObject address) {
+    public JSONObject getBalance(String address) {
         try {
-            final EthGetBalance balance= client.ethGetBalance(address.get("address").toString(), DefaultBlockParameter.valueOf("latest")).sendAsync()
+            final EthGetBalance balance= client.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).sendAsync()
                     .get(30, TimeUnit.SECONDS);
             JSONObject jsonObject = new JSONObject();
+            jsonObject.put("address",address);
             jsonObject.put("balance", balance.getBalance().toString());
             return jsonObject;
 
@@ -49,23 +47,22 @@ public class Web3Service {
         balanceJson.put("balance",balance.toString());
         balanceJson.put("token",tokenName);
         balanceJson.put("token_symbol",tokenSymbol);
-//        balanceJson.put("txs", List.of());
 
         return balanceJson;
     }
-    public  JSONObject subscribeERC20Wallet(JSONObject address, String tokenContract){
-        ClientTransactionManager transactionManager= new ClientTransactionManager(client,address.get("address").toString());
-        MyERC20 contract = MyERC20.load(tokenContract, client, transactionManager, new DefaultGasProvider());
-        Disposable s=contract.transferEventFlowable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST).subscribe(tx ->{
-            String toAddress = tx.to;
-            String fromAddress = tx.from;
-            String txHash = tx.log.getTransactionHash();
-        });
+//    public  JSONObject subscribeERC20Wallet(JSONObject address, String tokenContract){
+//        ClientTransactionManager transactionManager= new ClientTransactionManager(client,address.get("address").toString());
+//        MyERC20 contract = MyERC20.load(tokenContract, client, transactionManager, new DefaultGasProvider());
+//        Disposable s=contract.transferEventFlowable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST).subscribe(tx ->{
+//            String toAddress = tx.to;
+//            String fromAddress = tx.from;
+//            String txHash = tx.log.getTransactionHash();
+//        });
+//
+//        return new JSONObject();
+//    }
 
-        return new JSONObject();
-    }
-
-    public RawTransaction sendTransaction(JSONObject input) throws IOException {
+    public JSONObject sendTransaction(JSONObject input) throws IOException {
 
         EthGetTransactionCount ethGetTransactionCount= client.ethGetTransactionCount(
                 input.get("from").toString(), DefaultBlockParameter.valueOf("latest")
@@ -79,8 +76,17 @@ public class Web3Service {
         BigInteger gasPrice= gasProvider.getGasPrice();
         RawTransaction tx = RawTransaction.createEtherTransaction(nonce,gasPrice,gasLimit,to,value);
 
+        JSONObject rawTransaction=new JSONObject();
 
-        return tx;
+        BigInteger fees=tx.getGasLimit().multiply(tx.getGasPrice());
+
+        rawTransaction.put("from",input.get("from").toString());
+        rawTransaction.put("to",tx.getTo());
+        rawTransaction.put("value",tx.getValue());
+        rawTransaction.put("fees",fees);
+
+
+        return rawTransaction;
     }
 
     public JSONObject getFees() throws IOException {
