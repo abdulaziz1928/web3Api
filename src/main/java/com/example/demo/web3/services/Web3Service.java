@@ -78,12 +78,12 @@ public class Web3Service {
 
         JSONObject rawTransaction=new JSONObject();
 
-        BigInteger fees=tx.getGasLimit().multiply(tx.getGasPrice());
-
+//        BigInteger fees=tx.getGasLimit().multiply(tx.getGasPrice());
+        JSONObject fees=getFees();
         rawTransaction.put("from",input.get("from").toString());
         rawTransaction.put("to",tx.getTo());
         rawTransaction.put("value",tx.getValue());
-        rawTransaction.put("fees",fees);
+        rawTransaction.put("fees",new BigInteger(fees.get("max_fee").toString()));
 
 
         return rawTransaction;
