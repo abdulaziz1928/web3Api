@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple5;
 import org.web3j.tx.gas.DefaultGasProvider;
@@ -53,7 +54,8 @@ public class SwapService {
         String amnt= input.get("amount_eth").toString();
         BigInteger amount= new BigInteger(amnt);
         DefaultGasProvider def=new DefaultGasProvider();
-        StaticGasProvider s=new StaticGasProvider(def.getGasPrice().add(def.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
+        EthGasPrice gasPrice=client.ethGasPrice().send();
+        StaticGasProvider s=new StaticGasProvider(gasPrice.getGasPrice().add(gasPrice.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
         UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,s);
 
         List amountsout = contractRouter
@@ -66,8 +68,7 @@ public class SwapService {
         System.out.println(amountOutMin);
 
         return contractRouter.swapExactETHForTokens(amountOutMin, Arrays.asList(contractRouter.WETH().send(), token1),
-                credentials.getAddress(), BigInteger.valueOf((System.currentTimeMillis() / 1000) + 60 * 10), amount)
-                .sendAsync().get().getTransactionHash().toString();
+                credentials.getAddress(), BigInteger.valueOf((System.currentTimeMillis() / 1000) + 60 * 10), amount).send().getTransactionHash();
     }
 
     // ChainLink Price Feeds Input PrivateKey + Price Feed Contract Address
@@ -95,8 +96,10 @@ public class SwapService {
         String amnt= input.get("amount_token").toString();
         BigInteger amount= new BigInteger(amnt);
         DefaultGasProvider def=new DefaultGasProvider();
-        StaticGasProvider s=new StaticGasProvider(def.getGasPrice().add(def.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
+        EthGasPrice gasPrice=client.ethGasPrice().send();
+        StaticGasProvider s=new StaticGasProvider(gasPrice.getGasPrice().add(gasPrice.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
         UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,s);
+
         List amountsout= contractRouter.getAmountsOut(new BigInteger(amnt),List.of(token0,contractRouter.WETH().send())).send();
         double samountOutMin= Double.parseDouble(amountsout.get(1).toString()) * 90 / 100;
         long m= ((long) samountOutMin);
@@ -122,7 +125,8 @@ public class SwapService {
         String amnt= input.get("amount_token0").toString();
         BigInteger amount= new BigInteger(amnt);
         DefaultGasProvider def=new DefaultGasProvider();
-        StaticGasProvider s=new StaticGasProvider(def.getGasPrice().add(def.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
+        EthGasPrice gasPrice=client.ethGasPrice().send();
+        StaticGasProvider s=new StaticGasProvider(gasPrice.getGasPrice().add(gasPrice.getGasPrice().divide(new BigInteger("10"))),def.getGasLimit());
 
         UniswapV2Router02 contractRouter= UniswapV2Router02.load(routerContractAddress,client,credentials,s);
         List amountsout= contractRouter.getAmountsOut(new BigInteger(amnt),List.of(token0,token1)).send();
